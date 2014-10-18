@@ -30,13 +30,31 @@ let locate_source_file leafname =
       !search_dirs;
     !first_found
 
+let bold = "\x1b[1m"
+let ul = "\x1b[4m"
+let code_end = "\x1b[0m"
+
 let print_around_error source line start_char end_char =
   let ch = open_in source in
-    for _ = 0 to line - !lines do
+    (* Discard *)
+    for _ = 1 to line - !lines do
       if pos_in ch < in_channel_length ch then
         ignore (input_line ch)
     done;
-    for _ = 0 to !lines * 2 + 1 do
+    (* Print before *)
+    for _ = 1 to !lines do
+      if pos_in ch < in_channel_length ch then
+        Printf.printf "%s\n%!" (input_line ch)
+    done;
+    (* Print the one *)
+    if pos_in ch < in_channel_length ch then
+      begin
+        Printf.printf "!!!%s%!" ul;
+        Printf.printf "%s\n%!" (input_line ch);
+        Printf.printf "%s%!" code_end
+      end;
+    (* Print after *)
+    for _ = 1 to !lines do
       if pos_in ch < in_channel_length ch then
         Printf.printf "%s\n%!" (input_line ch)
     done;
@@ -52,7 +70,7 @@ let exn_handler e backtrace =
            match Printexc.Slot.format i slot with
              None -> ()
            | Some s ->
-               Printf.printf "***%s***\n%!" s;
+               Printf.printf "%s%s%s\n%!" bold s code_end;
                match Printexc.Slot.location slot with
                  None -> ()
                | Some loc ->
