@@ -1,0 +1,5 @@
+name="exnsource"
+description="Exception backtraces with source code printing"
+version="0.1"
+archive(byte)="exnsource.cma"
+archive(native)="exnsource.cmxa"
