@@ -1,4 +1,8 @@
 (* Source printing for exception backtraces. *)
+
+(* Remember: we cannot use exceptions inside the exception backtrace handler!
+Including things like End_of_file! Also, must flush any output. *)
+
 let lines = ref 5
 
 let search_dirs =
@@ -9,14 +13,12 @@ let add_dir dir =
 
 let rec remove_item prev dir dirs =
   match dirs with
-    [] -> List.rev prev
+    [] -> prev
   | h::t when h = dir -> remove_item prev dir t
   | h::t -> remove_item (h :: prev) dir t
 
 let remove_dir dir =
   search_dirs := remove_item [] dir !search_dirs
-
-exception Found of string
 
 let locate_source_file leafname =
   let first_found = ref None in
@@ -66,6 +68,4 @@ let exn_handler e backtrace =
 
 let _ =
   Printexc.set_uncaught_exception_handler exn_handler
-
-
 
