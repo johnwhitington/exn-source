@@ -2,7 +2,7 @@
 let lines = ref 5
 
 let search_dirs =
-  ref ["."; "/Users/john/trunk/stdlib"]
+  ref ["."]
 
 let add_dir dir =
   search_dirs := dir :: !search_dirs
@@ -67,12 +67,5 @@ let exn_handler e backtrace =
 let _ =
   Printexc.set_uncaught_exception_handler exn_handler
 
-let f () =
-  List.find (fun x -> x = 1) []
 
-let _ =
-  try
-    f ()
-  with
-    e -> raise e
 
