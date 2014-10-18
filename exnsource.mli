@@ -1,1 +1,9 @@
-(* exnsource *)
+(** Number of lines to print either side of the offending one *)
+val lines : int ref
+
+(** Add a directory to be searched. *)
+val add_dir : string -> unit
+
+(** Remove a directory from the search list *)
+val remove_dir : string -> unit
+

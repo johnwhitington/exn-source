@@ -8,7 +8,7 @@ OCAMLNCFLAGS = -g -w -3
 OCAMLBCFLAGS = -g -w -3
 OCAMLLDFLAGS = -g
 
-all : native-code-library byte-code-library htdoc
+all : native-code-library byte-code-library native-code htdoc
 
 clean ::
 	rm -rf doc
