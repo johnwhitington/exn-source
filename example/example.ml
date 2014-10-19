@@ -1,6 +1,6 @@
 let _ =
-  Exnsource.add_dir "/Users/john/trunk/stdlib";
-  Exnsource.lines := 10
+  Exnsource.add_dir "/Users/john/trunk/stdlib"; (* <--- Add yours here! *)
+  Exnsource.lines := 5 (* Number of lines each side *)
   
 let f () =
   List.find (fun x -> x = 1) []
