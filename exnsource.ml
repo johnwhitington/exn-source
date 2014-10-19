@@ -32,7 +32,7 @@ let bold, ul, code_end = ("\x1b[1m", "\x1b[4m", "\x1b[0m")
 
 let print_underlined str s e =
   let len = String.length str in
-    let pchar x = if x > 0 && x < len then prerr_char str.[x] in
+    let pchar x = if x >= 0 && x < len then Printf.eprintf "%c%!" str.[x] in
       for x = 0 to s - 1 do pchar x done;
       Printf.eprintf "%s%!" ul;
       for x = s to e do pchar x done;
