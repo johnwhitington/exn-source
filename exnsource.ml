@@ -1,6 +1,4 @@
-(* Source printing for exception backtraces. Remember: we cannot use exceptions
-inside the exception backtrace handler, including things like End_of_file!
-Also, must flush any output. *)
+(* Source printing for exception backtraces. Remember: must flush any output. *)
 let lines = ref 5
 
 let search_dirs =
