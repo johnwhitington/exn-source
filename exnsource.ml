@@ -60,6 +60,9 @@ let print_around_error source line start_char end_char =
     close_in ch
 
 let exn_handler e backtrace =
+  Printf.eprintf
+    "%sFatal error: exception %s%s\n%!"
+    bold (Printexc.to_string e) code_end;
   match Printexc.backtrace_slots backtrace with
     None ->
       Printf.eprintf
