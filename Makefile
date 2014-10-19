@@ -4,8 +4,8 @@ REAL_OCAMLFIND = ocamlfind
 
 RESULT = exnsource
 
-OCAMLNCFLAGS = -g -w -3
-OCAMLBCFLAGS = -g -w -3
+OCAMLNCFLAGS = -g
+OCAMLBCFLAGS = -g
 OCAMLLDFLAGS = -g
 
 all : native-code-library byte-code-library native-code htdoc

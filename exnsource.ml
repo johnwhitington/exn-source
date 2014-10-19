@@ -1,8 +1,6 @@
-(* Source printing for exception backtraces. *)
-
-(* Remember: we cannot use exceptions inside the exception backtrace handler!
-Including things like End_of_file! Also, must flush any output. *)
-
+(* Source printing for exception backtraces. Remember: we cannot use exceptions
+inside the exception backtrace handler, including things like End_of_file!
+Also, must flush any output. *)
 let lines = ref 5
 
 let search_dirs =
@@ -30,30 +28,31 @@ let locate_source_file leafname =
       !search_dirs;
     !first_found
 
-let bold = "\x1b[1m"
-let ul = "\x1b[4m"
-let code_end = "\x1b[0m"
+let bold, ul, code_end = ("\x1b[1m", "\x1b[4m", "\x1b[0m")
+
+let print_underlined str s e =
+  let len = String.length str in
+    let pchar x = if x > 0 && x < len then print_char str.[x] in
+      for x = 0 to s - 1 do pchar x done;
+      Printf.printf "%s%!" ul;
+      for x = s to e do pchar x done;
+      Printf.printf "%s%!" code_end;
+      for x = e + 1 to len - 1 do pchar x done;
+      Printf.printf "\n%!"
 
 let print_around_error source line start_char end_char =
-  let ch = open_in source in
-    (* Discard *)
-    for _ = 1 to line - !lines do
+  let ch = open_in source
+  and read = ref 0 in
+    for _ = 1 to line - !lines - 1 do
       if pos_in ch < in_channel_length ch then
-        ignore (input_line ch)
+        (ignore (input_line ch); read := !read + 1)
     done;
-    (* Print before *)
-    for _ = 1 to !lines do
+    for _ = 1 to min !lines (line - !read) do
       if pos_in ch < in_channel_length ch then
         Printf.printf "%s\n%!" (input_line ch)
     done;
-    (* Print the one *)
     if pos_in ch < in_channel_length ch then
-      begin
-        Printf.printf "!!!%s%!" ul;
-        Printf.printf "%s\n%!" (input_line ch);
-        Printf.printf "%s%!" code_end
-      end;
-    (* Print after *)
+      print_underlined (input_line ch) start_char end_char;
     for _ = 1 to !lines do
       if pos_in ch < in_channel_length ch then
         Printf.printf "%s\n%!" (input_line ch)
@@ -63,7 +62,7 @@ let print_around_error source line start_char end_char =
 let exn_handler e backtrace =
   match Printexc.backtrace_slots backtrace with
     None ->
-      Printf.printf "No backtrace found.\n%!"
+      Printf.printf "No backtrace. Compile and link with -g, set OCAMLRUNPARAM=b.\n%!"
   | Some slots ->
       Array.iteri
         (fun i slot ->
