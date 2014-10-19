@@ -12,7 +12,7 @@ the example.
 To use
 ------
 
-Use the package `exnsource' when compiling your program. Compile and link with
+Use the package `exnsource` when compiling your program. Compile and link with
 `-g` and run with `OCAMLRUNPARAM=b` as usual.
 
 Full instructions
