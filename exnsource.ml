@@ -29,18 +29,33 @@ let locate_source_file leafname =
 let bold, ul, code_end = ("\x1b[1m", "\x1b[4m", "\x1b[0m")
 
 let print_underlined str s e =
-  let len = String.length str in
+  let len = String.length str
+  and underlined = ref 0 in
     let pchar x = if x >= 0 && x < len then Printf.eprintf "%c%!" str.[x] in
       for x = 0 to s - 1 do pchar x done;
       Printf.eprintf "%s%!" ul;
-      for x = s to e do pchar x done;
+      for x = s to e do
+        pchar x;
+        if x >= 0 && x < len then underlined := !underlined + 1
+      done;
       Printf.eprintf "%s%!" code_end;
       for x = e + 1 to len - 1 do pchar x done;
-      Printf.eprintf "\n%!"
+      Printf.eprintf "\n%!";
+      !underlined
+
+let print_underlining_prefix str n =
+  let len = String.length str in
+    let do_ul = min len n in
+      Printf.eprintf "%s%!" ul;
+      Printf.eprintf "%s%!" (String.sub str 0 do_ul);
+      Printf.eprintf "%s%!" code_end;
+      Printf.eprintf "%s\n%!" (String.sub str do_ul (len - do_ul));
+      do_ul
 
 let print_around_error source line start_char end_char =
   let ch = open_in source
-  and read = ref 0 in
+  and read = ref 0
+  and to_ul = ref (end_char - start_char + 1) in
     for _ = 1 to line - !lines - 1 do
       if pos_in ch < in_channel_length ch then
         (ignore (input_line ch); read := !read + 1)
@@ -49,11 +64,21 @@ let print_around_error source line start_char end_char =
       if pos_in ch < in_channel_length ch then
         Printf.eprintf "%s\n%!" (input_line ch)
     done;
-    if pos_in ch < in_channel_length ch then
-      print_underlined (input_line ch) start_char end_char;
+    begin if pos_in ch < in_channel_length ch then
+      let line = input_line ch in
+        to_ul := !to_ul - print_underlined line start_char end_char;
+    end;
     for _ = 1 to !lines do
       if pos_in ch < in_channel_length ch then
-        Printf.eprintf "%s\n%!" (input_line ch)
+        begin
+          let line = input_line ch in
+            (* Hack. OCaml often produces a location hanging over to the next line. *)
+            if !to_ul = 1 && String.length line > 0 && line.[0] = ' '
+              then to_ul := 0;
+            if !to_ul > 0
+              then to_ul := !to_ul - print_underlining_prefix line !to_ul
+              else Printf.eprintf "%s\n%!" line
+        end
     done;
     close_in ch
 

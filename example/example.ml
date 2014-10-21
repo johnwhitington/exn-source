@@ -1,7 +1,7 @@
 let _ =
-  Exnsource.add_dir "/Users/john/trunk/stdlib"; (* <--- Add yours here! *)
-  Exnsource.lines := 5 (* Number of lines each side *)
-  
+  Exnsource.add_dir "/usr/local/lib/ocaml";
+  Exnsource.lines := 5
+
 let f () =
   List.find (fun x -> x = 1) []
 
