@@ -4,7 +4,7 @@
 val lines : int ref
 
 (** Add a directory to be searched. The default is the current working
-directory only. The search order is unspecified. *)
+directory, and the OCaml standard library. The search order is unspecified. *)
 val add_dir : string -> unit
 
 (** Remove a directory from the search list. *)
