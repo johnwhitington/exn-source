@@ -7,6 +7,32 @@ let search_dirs =
 let add_dir dir =
   search_dirs := dir :: !search_dirs
 
+let _ =
+  try
+    let tname = Filename.temp_file "ocaml" "exnsource" in
+      ignore (Sys.command ("ocamlc -config >" ^ tname));
+      let tmp = open_in tname in
+        let line = ref "" in
+          try
+            while true do
+              let s = input_line tmp in
+                if
+                  String.length s >= 18 &&
+                  String.sub s 0 18 = "standard_library: "
+                then
+                  line := s
+            done
+          with
+            End_of_file ->
+              close_in tmp;
+              Sys.remove tname;
+              if !line <> "" then
+                add_dir
+                  (Filename.dir_sep ^
+                   (String.sub !line 19 (String.length !line - 19)))
+  with
+    _ -> ()
+
 let rec remove_item prev dir dirs =
   match dirs with
     [] -> prev
@@ -72,7 +98,8 @@ let print_around_error source line start_char end_char =
       if pos_in ch < in_channel_length ch then
         begin
           let line = input_line ch in
-            (* Hack. OCaml often produces a location hanging over to the next line. *)
+            (* Hack. OCaml often produces a location hanging over to the next
+            line. Suppress if white space. *)
             if !to_ul = 1 && String.length line > 0 && line.[0] = ' '
               then to_ul := 0;
             if !to_ul > 0
